@@ -5,19 +5,39 @@ import { RouteTypes } from "./global/types/routeTypes";
 import { UserRole } from "./global/types/userRoles";
 import "./App.css";
 import NoInternetPage from "./pages/NoInternetPage";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { setToken, setUserType } from "./redux/authSlice";
+import { RootState } from "./redux/store";
 
 function getGuardedRoute(
   component: React.ReactNode | null,
   isRouteAccessible = false,
   redirectUrl = ""
 ) {
-  console.log({ isRouteAccessible });
   if (isRouteAccessible) return component;
   return <Navigate to={redirectUrl} replace />;
 }
 
 function App() {
-  const userRole = UserRole.ADMIN;
+  const dispatch = useDispatch();
+  const userType = useSelector((state: RootState) => state.auth.userType);
+
+  console.log(userType);
+
+  // Auto-fill token from local storage on initial render
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const savedUserType = localStorage.getItem("userType");
+    if (token) {
+      dispatch(setToken(token));
+      console.log("token", token);
+    }
+    if (savedUserType) {
+      dispatch(setUserType(savedUserType as UserRole));
+      console.log("userType", savedUserType);
+    }
+  }, [dispatch]);
 
   return (
     <>
@@ -32,7 +52,7 @@ function App() {
                   route.info === RouteTypes.PRIVATE ? (
                     getGuardedRoute(
                       <route.element />,
-                      route.userRole.includes(userRole),
+                      route.userRole.includes(userType),
                       route.redirectUrl
                     )
                   ) : route.info === RouteTypes.PUBLIC ? (

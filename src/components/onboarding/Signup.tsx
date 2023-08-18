@@ -15,7 +15,9 @@ import {
 import { OnboardingStyled, PhoneInputStyled } from "./styled";
 import { UserRole } from "../../global/types/userRoles";
 import { RoutePaths } from "../../global/types/routeTypes";
-import { signupService } from "../../services/authService";
+import axios from "axios";
+import ENDPOINTS from "../../global/constants/endpoints";
+import { validateAuthUser } from "../../global/validations";
 
 const initialValues = {
   firstName: "",
@@ -25,40 +27,6 @@ const initialValues = {
   phone: "",
   password: "",
   userType: UserRole,
-};
-
-const validate = (values) => {
-  type Error = {
-    firstName?: string;
-    lastName?: string;
-    username?: string;
-    email?: string;
-    password?: string;
-    phone?: string;
-    userType?: string;
-  };
-  const errors: Error = {};
-  if (!values.firstName) {
-    errors.firstName = "⋆Required";
-  }
-  if (!values.lastName) {
-    errors.lastName = "⋆Required";
-  }
-  if (!values.username) {
-    errors.username = "⋆Required";
-  }
-  if (!values.password) {
-    errors.password = "⋆Required";
-  }
-  if (!values.phone) {
-    errors.phone = "⋆Required";
-  }
-  if (!values.email) {
-    errors.email = "⋆Required";
-  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-    errors.email = "Invalid email format";
-  }
-  return errors;
 };
 
 export default function Signup() {
@@ -79,13 +47,13 @@ export default function Signup() {
     console.log(dataToSend);
 
     try {
-      const res = await signupService(dataToSend);
-      console.log(res, "signup success");
+      const response = await axios.post(`${ENDPOINTS.SIGNUP}`, dataToSend);
+      console.log(response);
       navigate(RoutePaths.LOGIN);
       resetForm();
     } catch (err) {
-      console.log(err);
-      enqueueSnackbar(err?.data?.message || "Some error occurred!", {
+      console.log(err?.response?.data?.message);
+      enqueueSnackbar(err?.response?.data?.message || "Some error occurred!", {
         variant: "error",
       });
       return;
@@ -95,7 +63,7 @@ export default function Signup() {
   const formik = useFormik({
     initialValues,
     onSubmit,
-    validate,
+    validate: validateAuthUser,
   });
 
   return (

@@ -15,6 +15,11 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import navLinks from "../../global/constants/navLinks";
 import { UserRole } from "../../global/types/userRoles";
+import { useNavigate } from "react-router";
+import { Button } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/authSlice";
+import { RootState } from "../../redux/store";
 
 const drawerWidth = 240;
 
@@ -25,13 +30,15 @@ interface Props {
 
 export default function Sidebar(props: Props) {
   const { window } = props;
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const userRole = UserRole.ADMIN;
+  const userType = useSelector((state: RootState) => state.auth.userType);
 
   const drawer = (
     <div>
@@ -39,10 +46,10 @@ export default function Sidebar(props: Props) {
       <Divider />
       <List>
         {navLinks
-          .filter((item) => item.userRole.includes(userRole))
+          .filter((item) => item.userRole.includes(userType))
           .map((item) => (
             <ListItem key={item.id} disablePadding>
-              <ListItemButton>
+              <ListItemButton onClick={() => navigate(item.path)}>
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.name} />
               </ListItemButton>
@@ -65,7 +72,12 @@ export default function Sidebar(props: Props) {
           ml: { sm: `${drawerWidth}px` },
         }}
       >
-        <Toolbar>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -78,6 +90,15 @@ export default function Sidebar(props: Props) {
           <Typography variant="h6" noWrap component="div">
             Admin Panel
           </Typography>
+          <Box
+            sx={{ cursor: "pointer" }}
+            onClick={() => {
+              dispatch(logout());
+              navigate("/");
+            }}
+          >
+            Logout
+          </Box>
         </Toolbar>
       </AppBar>
       <Box

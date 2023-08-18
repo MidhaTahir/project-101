@@ -1,9 +1,12 @@
+import EditForm from "../components/form/EditUserForm";
 import Sidebar from "../components/sidebar/Sidebar";
 
 const AdminPage = () => {
   return (
     <div>
-      <Sidebar>hello</Sidebar>
+      <Sidebar>
+        <EditForm />
+      </Sidebar>
     </div>
   );
 };

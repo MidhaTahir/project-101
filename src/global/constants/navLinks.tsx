@@ -1,28 +1,36 @@
 import { Dashboard } from "@mui/icons-material";
 import { RoutePaths } from "../types/routeTypes";
+import { UserRole } from "../types/userRoles";
 
 const navLinks = [
+  {
+    // private page
+    // accessible by all user roles
+    id: 3,
+    path: RoutePaths.DETAILS,
+    name: "Details (Shared)",
+    userRole: [UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.CUSTOMER],
+    icon: <Dashboard />,
+  },
   {
     id: 0,
     path: RoutePaths.ADMIN,
     name: "Admin",
-    userRole: ["admin"],
+    userRole: [UserRole.ADMIN],
     icon: <Dashboard />,
   },
   {
     id: 1,
-    path: RoutePaths.CUSTOMER,
-    name: "Customer",
-    userRole: ["customer"],
+    path: RoutePaths.GET_CUSTOMERS,
+    name: "Get Customers",
+    userRole: [UserRole.ADMIN],
     icon: <Dashboard />,
   },
   {
-    // private page
-    // accessible by all user roles
     id: 2,
-    path: RoutePaths.DETAILS,
-    name: "Details (Shared)",
-    userRole: ["admin", "customer"],
+    path: RoutePaths.CUSTOMER,
+    name: "Customer",
+    userRole: [UserRole.CUSTOMER],
     icon: <Dashboard />,
   },
 ];

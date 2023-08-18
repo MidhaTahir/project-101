@@ -4,7 +4,10 @@ import { OnboardingStyled } from "./styled";
 import { RoutePaths } from "../../global/types/routeTypes";
 import { useNavigate } from "react-router";
 import { useSnackbar } from "notistack";
-import { loginService } from "../../services/authService";
+import ENDPOINTS from "../../global/constants/endpoints";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setToken, setUserData, setUserType } from "../../redux/authSlice";
 
 const initialValues = {
   email: "",
@@ -30,11 +33,11 @@ const validate = (values) => {
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const { enqueueSnackbar } = useSnackbar();
 
   const onSubmit = async (values, { resetForm }) => {
-    console.log(values);
-
     const dataToSend = {
       username: values.email,
       password: values.password,
@@ -42,14 +45,17 @@ const Login = () => {
     console.log(dataToSend);
 
     try {
-      const res = await loginService(dataToSend);
-      console.log(res, "login success");
+      const response = await axios.post(`${ENDPOINTS.LOGIN}`, dataToSend);
+      console.log(response);
+      dispatch(setToken(response.data.payload.token));
+      dispatch(setUserType(response.data.payload.user.userType));
+      console.log(response.data.payload.user);
+      dispatch(setUserData(response.data.payload.user));
       resetForm();
-      navigate(RoutePaths.ADMIN);
-      enqueueSnackbar("Login Successful", { variant: "success" });
+      navigate(RoutePaths.DETAILS);
     } catch (err) {
       console.log(err);
-      enqueueSnackbar(err?.data?.message || "Some error occurred!", {
+      enqueueSnackbar(err?.response?.data?.message || "Some error occurred!", {
         variant: "error",
       });
       return;
