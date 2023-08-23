@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import Box from "@mui/material/Box";
 
 export const OnboardingStyled = styled.div`
   margin: auto;

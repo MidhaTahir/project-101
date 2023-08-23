@@ -1,4 +1,4 @@
-import { RoutePaths } from "./global/types/routeTypes";
+import { RoutePaths, RouteTypes } from "./global/types/routeTypes";
 import { UserRole } from "./global/types/userRoles";
 import {
   AdminPage,
@@ -15,7 +15,7 @@ const defaultRoutes = [
     path: RoutePaths.ADMIN,
     name: "Admin",
     element: AdminPage,
-    info: "private",
+    info: RouteTypes.PRIVATE,
     userRole: [UserRole.ADMIN],
     redirectUrl: "/not-found",
   },
@@ -23,7 +23,7 @@ const defaultRoutes = [
     path: RoutePaths.CUSTOMER,
     name: "Customer",
     element: CustomerPage,
-    info: "private",
+    info: RouteTypes.PRIVATE,
     userRole: [UserRole.CUSTOMER],
     redirectUrl: "/not-found",
   },
@@ -32,7 +32,7 @@ const defaultRoutes = [
     path: RoutePaths.GET_CUSTOMERS,
     name: "Get Customers",
     element: GetCustomersPage,
-    info: "private",
+    info: RouteTypes.PRIVATE,
     userRole: [UserRole.ADMIN, UserRole.SUPERADMIN],
     redirectUrl: "/not-found",
   },
@@ -42,7 +42,7 @@ const defaultRoutes = [
     path: RoutePaths.DETAILS,
     name: "Shared Page",
     element: SharedPage,
-    info: "private",
+    info: RouteTypes.PRIVATE,
     userRole: [UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.CUSTOMER],
     redirectUrl: "/not-found",
   },
@@ -51,21 +51,21 @@ const defaultRoutes = [
     path: RoutePaths.LOGIN,
     name: "LoginPage",
     element: LoginPage,
-    info: "public",
+    info: RouteTypes.PUBLIC,
     userRole: [UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.CUSTOMER],
   },
   {
     path: RoutePaths.SIGNUP,
     name: "SignupPage",
     element: SignupPage,
-    info: "public",
+    info: RouteTypes.PUBLIC,
     userRole: [UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.CUSTOMER],
   },
   {
     path: RoutePaths.NOT_FOUND,
     name: "Not Found Page",
     element: NotFoundPage,
-    info: "public",
+    info: RouteTypes.PUBLIC,
     userRole: [UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.CUSTOMER],
   },
 ];

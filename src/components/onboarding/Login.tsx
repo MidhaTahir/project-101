@@ -49,8 +49,8 @@ const Login = () => {
       console.log(response);
       dispatch(setToken(response.data.payload.token));
       dispatch(setUserType(response.data.payload.user.userType));
-      console.log(response.data.payload.user);
       dispatch(setUserData(response.data.payload.user));
+      console.log(response.data.payload.user);
       resetForm();
       navigate(RoutePaths.DETAILS);
     } catch (err) {
