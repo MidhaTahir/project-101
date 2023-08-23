@@ -16,6 +16,32 @@ const initialState: CustomerState = {
   error: null,
 };
 
+export const editCustomer = createAsyncThunk(
+  "customer/editCustomer",
+  async (editedCustomer: User, { getState }) => {
+    console.log("test");
+    // try {
+    //   const state: RootState = getState();
+    //   const token = state.auth.token;
+
+    //   const response = await axios.put(
+    //     `${ENDPOINTS.BASE_URL}/${ENDPOINTS.UPDATE_CUSTOMER}/${editedCustomer.id}`,
+    //     editedCustomer,
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     }
+    //   );
+
+    //   return response?.data?.customer as User;
+    // } catch (error) {
+    //   console.log(error);
+    //   throw error;
+    // }
+  }
+);
+
 export const fetchCustomers = createAsyncThunk(
   "customer/fetchCustomers",
   async (_, { getState }) => {
@@ -51,6 +77,20 @@ const customerSlice = createSlice({
         state.customers = action.payload;
       })
       .addCase(fetchCustomers.rejected, (state, action) => {
+        state.loading = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(editCustomer.pending, (state) => {
+        state.loading = "pending";
+      })
+      .addCase(editCustomer.fulfilled, (state, action) => {
+        state.loading = "succeeded";
+        const editedCustomer = action.payload;
+        state.customers = state.customers.map((customer) =>
+          customer.id === editedCustomer.id ? editedCustomer : customer
+        );
+      })
+      .addCase(editCustomer.rejected, (state, action) => {
         state.loading = "failed";
         state.error = action.error.message;
       });

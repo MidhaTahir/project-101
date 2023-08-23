@@ -6,9 +6,10 @@ import { UserRole } from "./global/types/userRoles";
 import "./App.css";
 import NoInternetPage from "./pages/NoInternetPage";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { setToken, setUserType } from "./redux/authSlice";
+import { useEffect, useState } from "react";
+import { setToken, setUserData, setUserType } from "./redux/authSlice";
 import { RootState } from "./redux/store";
+import { LoginPage, SignupPage } from "./pages";
 
 function getGuardedRoute(
   component: React.ReactNode | null,
@@ -20,15 +21,19 @@ function getGuardedRoute(
 }
 
 function App() {
+  const [loading, setLoading] = useState(true); // by default loading is true
   const dispatch = useDispatch();
   const userType = useSelector((state: RootState) => state.auth.userType);
 
   console.log(userType);
 
-  // Auto-fill token from local storage on initial render
+  // Auto-fill token from local storage on initial render (take some time to load)
   useEffect(() => {
     const token = localStorage.getItem("token");
     const savedUserType = localStorage.getItem("userType");
+    const storedUserString = localStorage.getItem("user");
+    const storedUserObject = JSON.parse(storedUserString);
+
     if (token) {
       dispatch(setToken(token));
       console.log("token", token);
@@ -37,7 +42,15 @@ function App() {
       dispatch(setUserType(savedUserType as UserRole));
       console.log("userType", savedUserType);
     }
+    if (storedUserObject) {
+      dispatch(setUserData(storedUserObject));
+      console.log("user", storedUserObject);
+    }
+
+    setLoading(false); // set loading to false after token is set
   }, [dispatch]);
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <>
