@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { Offline, Online } from "react-detect-offline"; //https://www.npmjs.com/package/react-detect-offline //Cannot find module 'react-detect-offline' or its corresponding type declarations. // npm install --save-dev @types/react-detect-offline
 import { defaultRoutes } from "./routes";
 import { RouteTypes } from "./global/types/routeTypes";
@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { setToken, setUserData, setUserType } from "./redux/authSlice";
 import { RootState } from "./redux/store";
 import { LoginPage, SignupPage } from "./pages";
+import isJwtTokenExpired from "./global/utils";
 
 function getGuardedRoute(
   component: React.ReactNode | null,
@@ -23,6 +24,7 @@ function getGuardedRoute(
 function App() {
   const [loading, setLoading] = useState(true); // by default loading is true
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const userType = useSelector((state: RootState) => state.auth.userType);
 
   console.log(userType);
@@ -48,7 +50,12 @@ function App() {
     }
 
     setLoading(false); // set loading to false after token is set
-  }, [dispatch]);
+
+    if (token && isJwtTokenExpired(token)) {
+      localStorage.clear();
+      navigate("/"); //login page
+    }
+  }, [dispatch, navigate]);
 
   if (loading) return <p>Loading...</p>;
 

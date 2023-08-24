@@ -1,6 +1,6 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
-import { fetchCustomers } from "../../redux/customerSlice";
+import { deleteCustomer, fetchCustomers } from "../../redux/customerSlice";
 import { useDispatch, useSelector } from "react-redux";
 import EditModal from "../modal/EditModal";
 
@@ -19,7 +19,7 @@ const CustomerTable = () => {
 
   const handleDelete = (customerId) => {
     if (window.confirm("Are you sure you want to delete this customer?")) {
-      // dispatch(deleteCustomer(customerId));
+      dispatch(deleteCustomer(customerId));
     }
   };
 

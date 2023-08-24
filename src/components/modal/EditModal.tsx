@@ -3,6 +3,8 @@ import Typography from "@mui/material/Typography";
 import { Formik, Form, Field } from "formik";
 import styled from "@emotion/styled";
 import { Box } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { editCustomer } from "../../redux/customerSlice";
 
 const StyledModalBox = styled(Box)`
   position: absolute;
@@ -44,6 +46,7 @@ const StyledButton = styled.button`
 `;
 
 const EditModal = ({ open, onClose, row, columnLabelMap }) => {
+  const dispatch = useDispatch();
   const editableFields = ["firstName", "lastName", "email", "phone"]; // Add other editable fields
   const editableRow = {};
   editableFields.forEach((field) => {
@@ -65,7 +68,12 @@ const EditModal = ({ open, onClose, row, columnLabelMap }) => {
           initialValues={editableRow}
           onSubmit={(values) => {
             console.log("Submit:", values);
-            // Dispatch your edit action here with the updated values
+            const dataToSend = {
+              id: row.id,
+              ...values,
+            };
+            console.log(dataToSend);
+            dispatch(editCustomer(dataToSend));
             onClose();
           }}
         >
