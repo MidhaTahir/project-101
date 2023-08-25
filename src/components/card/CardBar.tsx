@@ -1,6 +1,12 @@
 import { Card, CardContent, Typography, Divider } from "@mui/material";
+import { ReactNode } from "react";
 
-function CardBar({ title, chart }) {
+interface CardBarProps {
+  title: string;
+  chart: ReactNode;
+}
+
+const CardBar: React.FC<CardBarProps> = ({ title, chart }) => {
   return (
     <>
       <Card>
@@ -12,6 +18,6 @@ function CardBar({ title, chart }) {
       </Card>
     </>
   );
-}
+};
 
 export { CardBar };

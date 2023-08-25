@@ -1,4 +1,4 @@
-import { useFormik } from "formik";
+import { FormikHelpers, FormikValues, useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import PhoneInput from "react-phone-input-2";
@@ -33,7 +33,10 @@ export default function Signup() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  const onSubmit = async (values, { resetForm }) => {
+  const onSubmit = async (
+    values: FormikValues,
+    { resetForm }: FormikHelpers<FormikValues>
+  ) => {
     console.log(values);
     const dataToSend = {
       firstName: values.firstName,

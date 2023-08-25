@@ -5,11 +5,10 @@ import { RouteTypes } from "./global/types/routeTypes";
 import { UserRole } from "./global/types/userRoles";
 import "./App.css";
 import NoInternetPage from "./pages/NoInternetPage";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { setToken, setUserData, setUserType } from "./redux/authSlice";
-import { RootState } from "./redux/store";
-import { LoginPage, SignupPage } from "./pages";
+import { RootState, useAppDispatch } from "./redux/store";
 import isJwtTokenExpired from "./global/utils";
 
 function getGuardedRoute(
@@ -23,7 +22,7 @@ function getGuardedRoute(
 
 function App() {
   const [loading, setLoading] = useState(true); // by default loading is true
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const userType = useSelector((state: RootState) => state.auth.userType);
 
@@ -34,7 +33,9 @@ function App() {
     const token = localStorage.getItem("token");
     const savedUserType = localStorage.getItem("userType");
     const storedUserString = localStorage.getItem("user");
-    const storedUserObject = JSON.parse(storedUserString);
+    // const storedUserObject = JSON.parse(storedUserString); // null if no user is stored
+    const storedUserObject =
+      storedUserString !== null ? JSON.parse(storedUserString) : null;
 
     if (token) {
       dispatch(setToken(token));
@@ -72,7 +73,8 @@ function App() {
                   route.info === RouteTypes.PRIVATE ? (
                     getGuardedRoute(
                       <route.element />,
-                      route.userRole.includes(userType),
+                      // Use the non-null assertion operator ! to indicate that userType cannot be null
+                      route.userRole.includes(userType!),
                       route.redirectUrl
                     )
                   ) : route.info === RouteTypes.PUBLIC ? (

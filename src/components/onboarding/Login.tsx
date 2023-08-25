@@ -1,20 +1,21 @@
-import { useFormik } from "formik";
+import { FormikHelpers, FormikValues, useFormik } from "formik";
 import { Button, Grid, TextField, Typography } from "@mui/material";
 import { OnboardingStyled } from "./styled";
 import { RoutePaths } from "../../global/types/routeTypes";
 import { useNavigate } from "react-router";
 import { useSnackbar } from "notistack";
 import ENDPOINTS from "../../global/constants/endpoints";
-import axios from "axios";
-import { useDispatch } from "react-redux";
+import axios, { AxiosError } from "axios";
 import { setToken, setUserData, setUserType } from "../../redux/authSlice";
+import { LoginApiResponse } from "../../global/types/DTOs";
+import { useAppDispatch } from "../../redux/store";
 
 const initialValues = {
   email: "",
   password: "",
 };
 
-const validate = (values) => {
+const validate = (values: FormikValues) => {
   type Error = {
     email?: string;
     password?: string;
@@ -33,11 +34,14 @@ const validate = (values) => {
 
 const Login = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const onSubmit = async (values, { resetForm }) => {
+  const onSubmit = async (
+    values: typeof initialValues,
+    { resetForm }: FormikHelpers<typeof initialValues>
+  ) => {
     const dataToSend = {
       username: values.email,
       password: values.password,
@@ -45,7 +49,10 @@ const Login = () => {
     console.log(dataToSend);
 
     try {
-      const response = await axios.post(`${ENDPOINTS.LOGIN}`, dataToSend);
+      const response: LoginApiResponse = await axios.post(
+        `${ENDPOINTS.LOGIN}`,
+        dataToSend
+      );
       console.log(response);
       dispatch(setToken(response.data.payload.token));
       dispatch(setUserType(response.data.payload.user.userType));
@@ -55,9 +62,15 @@ const Login = () => {
       navigate(RoutePaths.DETAILS);
     } catch (err) {
       console.log(err);
-      enqueueSnackbar(err?.response?.data?.message || "Some error occurred!", {
+      const errMessage =
+        err instanceof AxiosError && err.response
+          ? err.response.data.message
+          : "Some error occurred!";
+
+      enqueueSnackbar(errMessage, {
         variant: "error",
       });
+
       return;
     }
   };

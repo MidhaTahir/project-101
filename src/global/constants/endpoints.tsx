@@ -8,4 +8,5 @@ const ENDPOINTS = {
   UPDATE_CUSTOMER: `${AUTH_BASE_URL}/customer`,
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export default ENDPOINTS;

@@ -1,15 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { User } from "../global/types/userRoles";
+import axios, { AxiosError } from "axios";
 import ENDPOINTS from "../global/constants/endpoints";
 import { RootState } from "./store";
 import { logout } from "./authSlice";
+import { Customer } from "../global/types/customerTypes";
 
 interface CustomerState {
-  customers: User[];
+  customers: Customer[] | undefined | null;
   loading: "idle" | "pending" | "succeeded" | "failed";
-  error: string | null;
+  error: string | null | undefined;
 }
+
+export type EditCustomerDTO = RequireOnly<
+  Customer,
+  "id" | "firstName" | "lastName" | "email" | "phone"
+>;
 
 const initialState: CustomerState = {
   customers: [],
@@ -17,16 +22,11 @@ const initialState: CustomerState = {
   error: null,
 };
 
-const handleUnauthorized = () => {
-  // Clear user data from Redux state, local storage, etc.
-  dispatch(logoutUser()); // Dispatch your logout action
-};
-
 export const deleteCustomer = createAsyncThunk(
   "customer/deleteCustomer",
-  async (customerId: number, { getState }) => {
+  async (customerId: number | string, { getState }) => {
     try {
-      const state: RootState = getState();
+      const state: RootState = getState() as RootState;
       const token = state.auth.token;
 
       await axios.delete(`${ENDPOINTS.DELETE_CUSTOMER}/${customerId}`, {
@@ -45,10 +45,10 @@ export const deleteCustomer = createAsyncThunk(
 
 export const editCustomer = createAsyncThunk(
   "customer/editCustomer",
-  async (editedCustomer: User, { getState }) => {
+  async (editedCustomer: EditCustomerDTO, { getState }) => {
     console.log({ editedCustomer });
     try {
-      const state: RootState = getState();
+      const state: RootState = getState() as RootState;
       const token = state.auth.token;
 
       const response = await axios.put(
@@ -63,7 +63,7 @@ export const editCustomer = createAsyncThunk(
 
       console.log({ response });
 
-      return response?.data?.customer as User;
+      return response?.data?.customer as Customer;
     } catch (error) {
       console.log(error);
       throw error;
@@ -76,7 +76,7 @@ export const fetchCustomers = createAsyncThunk(
   async (_, { getState, dispatch }) => {
     // eslint-disable-next-line no-useless-catch
     try {
-      const state: RootState = getState();
+      const state: RootState = getState() as RootState;
       const token = state.auth.token;
 
       const response = await axios.get(ENDPOINTS.GET_ALL_CUSTOMERS, {
@@ -88,7 +88,11 @@ export const fetchCustomers = createAsyncThunk(
       return response?.data?.customers as Customer[];
     } catch (error) {
       // 401 unauthorized (token is expired)
-      if (error.response && error.response.status === 401) {
+      if (
+        error instanceof AxiosError &&
+        error.response &&
+        error.response.status === 401
+      ) {
         dispatch(logout());
       }
 
@@ -120,9 +124,11 @@ const customerSlice = createSlice({
       .addCase(editCustomer.fulfilled, (state, action) => {
         state.loading = "succeeded";
         const editedCustomer = action.payload;
-        state.customers = state.customers.map((customer) =>
-          customer.id === editedCustomer.id ? editedCustomer : customer
-        );
+        state.customers = state.customers
+          ? state.customers.map((customer) =>
+              customer.id === editedCustomer.id ? editedCustomer : customer
+            )
+          : [];
       })
       .addCase(editCustomer.rejected, (state, action) => {
         state.loading = "failed";
@@ -134,9 +140,11 @@ const customerSlice = createSlice({
       .addCase(deleteCustomer.fulfilled, (state, action) => {
         state.loading = "succeeded";
         const deletedCustomerId = action.payload;
-        state.customers = state.customers.filter(
-          (customer) => customer.id !== deletedCustomerId
-        );
+        state.customers = state.customers
+          ? state.customers.filter(
+              (customer) => customer.id !== deletedCustomerId
+            )
+          : null;
       })
       .addCase(deleteCustomer.rejected, (state, action) => {
         state.loading = "failed";

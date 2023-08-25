@@ -1,6 +1,13 @@
 import { Card, CardContent, Typography, Divider } from "@mui/material";
+import { ReactNode } from "react";
 
-function CardSummary({ title, value, footer }) {
+interface CardSummaryProps {
+  title: string;
+  value: string | number;
+  footer: ReactNode;
+}
+
+const CardSummary: React.FC<CardSummaryProps> = ({ title, value, footer }) => {
   return (
     <>
       <Card>
@@ -17,6 +24,6 @@ function CardSummary({ title, value, footer }) {
       </Card>
     </>
   );
-}
+};
 
 export { CardSummary };

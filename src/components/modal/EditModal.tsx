@@ -2,11 +2,13 @@ import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { Formik, Form, Field } from "formik";
 import styled from "@emotion/styled";
-import { Box } from "@mui/material";
-import { useDispatch } from "react-redux";
-import { editCustomer } from "../../redux/customerSlice";
+import { Box, Theme } from "@mui/material";
+import { EditCustomerDTO, editCustomer } from "../../redux/customerSlice";
+import theme from "../../theme";
+import { Customer } from "../../global/types/customerTypes";
+import { useAppDispatch } from "../../redux/store";
 
-const StyledModalBox = styled(Box)`
+const StyledModalBox = styled(Box)<{ theme: Theme }>`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -31,7 +33,7 @@ const StyledField = styled(Field)`
   margin-bottom: 16px;
 `;
 
-const StyledButton = styled.button`
+const StyledButton = styled.button<{ theme: Theme }>`
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
@@ -45,12 +47,25 @@ const StyledButton = styled.button`
   }
 `;
 
-const EditModal = ({ open, onClose, row, columnLabelMap }) => {
-  const dispatch = useDispatch();
+interface EditModalProps {
+  open: boolean;
+  onClose: () => void;
+  row: Customer;
+  // In TypeScript, Record is a utility type that allows you to define an object type with specific key-value pairs.
+  columnLabelMap: Record<string, string>; // Assuming columnLabelMap is a mapping of column names to labels
+}
+
+const EditModal: React.FC<EditModalProps> = ({
+  open,
+  onClose,
+  row,
+  columnLabelMap,
+}) => {
+  const dispatch = useAppDispatch();
   const editableFields = ["firstName", "lastName", "email", "phone"]; // Add other editable fields
-  const editableRow = {};
+  const editableRow = {} as Record<string, unknown>;
   editableFields.forEach((field) => {
-    editableRow[field] = row[field];
+    editableRow[field] = row[field as keyof Customer];
   });
 
   return (
@@ -60,19 +75,21 @@ const EditModal = ({ open, onClose, row, columnLabelMap }) => {
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
-      <StyledModalBox>
+      <StyledModalBox theme={theme}>
         <Typography variant="h6" component="h2">
           Edit Customer
         </Typography>
         <Formik
           initialValues={editableRow}
-          onSubmit={(values) => {
+          onSubmit={(values: typeof editableRow) => {
             console.log("Submit:", values);
-            const dataToSend = {
+            const dataToSend: EditCustomerDTO = {
               id: row.id,
-              ...values,
+              firstName: row.firstName,
+              lastName: row.lastName,
+              email: row.email,
+              phone: row.phone,
             };
-            console.log(dataToSend);
             dispatch(editCustomer(dataToSend));
             onClose();
           }}
@@ -84,8 +101,10 @@ const EditModal = ({ open, onClose, row, columnLabelMap }) => {
                 <StyledField type="text" name={key} />
               </div>
             ))}
-            <StyledButton type="submit">Save</StyledButton>
-            <StyledButton type="button" onClick={onClose}>
+            <StyledButton theme={theme} type="submit">
+              Save
+            </StyledButton>
+            <StyledButton theme={theme} type="button" onClick={onClose}>
               Cancel
             </StyledButton>
           </Form>

@@ -15,9 +15,9 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import navLinks from "../../global/constants/navLinks";
 import { useNavigate } from "react-router";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { logout } from "../../redux/authSlice";
-import { RootState } from "../../redux/store";
+import { RootState, useAppDispatch } from "../../redux/store";
 
 const drawerWidth = 240;
 
@@ -29,7 +29,7 @@ interface Props {
 export default function Sidebar(props: Props) {
   const { window } = props;
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
@@ -44,7 +44,7 @@ export default function Sidebar(props: Props) {
       <Divider />
       <List>
         {navLinks
-          .filter((item) => item.userRole.includes(userType))
+          .filter((item) => item.userRole.includes(userType!))
           .map((item) => (
             <ListItem key={item.id} disablePadding>
               <ListItemButton onClick={() => navigate(item.path)}>

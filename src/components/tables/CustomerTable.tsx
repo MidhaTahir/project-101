@@ -1,8 +1,9 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { deleteCustomer, fetchCustomers } from "../../redux/customerSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import EditModal from "../modal/EditModal";
+import { RootState, useAppDispatch } from "../../redux/store";
 
 const columnLabelMap = {
   id: "ID",
@@ -17,7 +18,7 @@ const CustomerTable = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const handleClose = () => setIsEditModalOpen(false);
 
-  const handleDelete = (customerId) => {
+  const handleDelete = (customerId: string | number) => {
     if (window.confirm("Are you sure you want to delete this customer?")) {
       dispatch(deleteCustomer(customerId));
     }
@@ -54,7 +55,7 @@ const CustomerTable = () => {
     },
   ];
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { customers, loading, error } = useSelector(
     (state: RootState) => state.customer
   );
@@ -67,12 +68,12 @@ const CustomerTable = () => {
     <div style={{ height: 300, width: "100%" }}>
       {loading === "pending" && <p>Loading...</p>}
       {loading === "failed" && <p>Error: {error}</p>}
-      {loading === "succeeded" && (
+      {loading === "succeeded" && customers && (
         <DataGrid rows={customers} columns={columns} />
       )}
 
       {/* Render EditModal if isEditModalOpen is true */}
-      {isEditModalOpen && (
+      {isEditModalOpen && selectedCustomer && (
         <EditModal
           onClose={() => {
             setIsEditModalOpen(false);

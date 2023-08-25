@@ -29,7 +29,7 @@ const PieChartComponent = () => {
       <h2>Pie Chart Example</h2>
       <PieChart width={400} height={300}>
         <Pie data={data} dataKey="userId" nameKey="title" fill="#8884d8">
-          {data.map((entry, index) => (
+          {data.map((_, index) => (
             <Cell key={index} fill={getRandomColor()} />
           ))}
         </Pie>
