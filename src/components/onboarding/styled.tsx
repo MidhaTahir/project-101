@@ -54,7 +54,7 @@ export const OnboardingStyled = styled.div`
   }
 `;
 
-export const PhoneInputStyled = styled.div`
+export const PhoneInputStyled = styled.div<{ isInvalid: boolean | undefined }>`
   .phone-container {
     .selected-flag {
       padding: 10px;

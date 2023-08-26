@@ -1,4 +1,4 @@
-import { FormikHelpers, FormikValues, useFormik } from "formik";
+import { FormikHelpers, useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import PhoneInput from "react-phone-input-2";
@@ -15,7 +15,7 @@ import {
 import { OnboardingStyled, PhoneInputStyled } from "./styled";
 import { UserRole } from "../../global/types/userRoles";
 import { RoutePaths } from "../../global/types/routeTypes";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import ENDPOINTS from "../../global/constants/endpoints";
 import { validateAuthUser } from "../../global/validations";
 
@@ -34,8 +34,8 @@ export default function Signup() {
   const { enqueueSnackbar } = useSnackbar();
 
   const onSubmit = async (
-    values: FormikValues,
-    { resetForm }: FormikHelpers<FormikValues>
+    values: typeof initialValues,
+    { resetForm }: FormikHelpers<typeof initialValues>
   ) => {
     console.log(values);
     const dataToSend = {
@@ -55,10 +55,16 @@ export default function Signup() {
       navigate(RoutePaths.LOGIN);
       resetForm();
     } catch (err) {
-      console.log(err?.response?.data?.message);
-      enqueueSnackbar(err?.response?.data?.message || "Some error occurred!", {
+      console.log(err);
+      const errMessage =
+        err instanceof AxiosError && err.response
+          ? err.response.data.message
+          : "Some error occurred!";
+
+      enqueueSnackbar(errMessage, {
         variant: "error",
       });
+
       return;
     }
   };
@@ -191,8 +197,8 @@ export default function Signup() {
               <PhoneInput
                 specialLabel={""}
                 country={"us"}
-                name="phone"
-                id="phone"
+                // name="phone"
+                // id="phone"
                 containerClass="phone-container"
                 inputClass="input-container"
                 dropdownClass="dropdown-container"
@@ -200,8 +206,6 @@ export default function Signup() {
                 value={formik.values.phone}
                 onChange={(e) => formik.setFieldValue("phone", e)}
                 onBlur={formik.handleBlur}
-                error={formik.touched.phone && Boolean(formik.errors.phone)}
-                helperText={formik.touched.phone && formik.errors.phone}
               />
               <div className="error">
                 {(formik.touched.phone && formik.errors.phone) || ""}
