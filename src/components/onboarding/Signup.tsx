@@ -45,7 +45,7 @@ export default function Signup() {
       email: values.email,
       password: values.password,
       phone: values.phone,
-      userType: values.userType.toLowerCase(),
+      userType: values.userType,
     };
     console.log(dataToSend);
 

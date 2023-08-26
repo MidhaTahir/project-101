@@ -1,4 +1,6 @@
-export const validateAuthUser = (values) => {
+import { FormikValues } from "formik";
+
+export const validateAuthUser = (values: FormikValues) => {
   type Error = {
     firstName?: string;
     lastName?: string;
