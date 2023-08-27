@@ -7,7 +7,7 @@ import "./App.css";
 import NoInternetPage from "./pages/NoInternetPage";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { setToken, setUserData, setUserType } from "./redux/authSlice";
+import { logout, setToken, setUserData, setUserType } from "./redux/authSlice";
 import { RootState, useAppDispatch } from "./redux/store";
 import isJwtTokenExpired from "./global/utils";
 
@@ -54,6 +54,7 @@ function App() {
 
     if (token && isJwtTokenExpired(token)) {
       localStorage.clear();
+      dispatch(logout());
       navigate("/"); //login page
     }
   }, [dispatch, navigate]);
